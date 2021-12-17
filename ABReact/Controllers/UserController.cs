@@ -23,7 +23,7 @@ namespace ABReact.Controllers
         [HttpGet("id")]
         public User GetUser(int id)
         {
-            return _ctx.Users.FirstOrDefault(x => x.Id == id);
+            return _ctx.Users.FirstOrDefault(x => x.UserId == id);
         }   
 
         [HttpGet]

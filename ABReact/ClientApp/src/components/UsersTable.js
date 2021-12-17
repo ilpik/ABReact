@@ -19,7 +19,6 @@ export class UsersTable extends Component {
     e.preventDefault();
     console.log("Отправлена форма.");
   }
-
   static renderTable(users) {
     return (
       <div>
@@ -37,6 +36,7 @@ export class UsersTable extends Component {
             <tbody>
               {users.map((user) => (
                 <User
+                  key={user.id}
                   id={user.id}
                   userId={user.userId}
                   created={user.created}

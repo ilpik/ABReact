@@ -2,13 +2,21 @@ import React from "react";
 
 const user = (props) => {
   return (
-    <tr key={props.id}>
+    <tr>
       <td>{props.userId}</td>
       <td>
-        <input type="datetime" value={props.created} />
+        <input
+          type="datetime"
+          value={props.created}
+          onChange={() => console.log("Добавить 1")}
+        />
       </td>
       <td>
-        <input type="datetime" value={props.lastActivity} />
+        <input
+          type="datetime"
+          value={props.lastActivity}
+          onChange={() => console.log("Добавить 2")}
+        />
       </td>
     </tr>
   );

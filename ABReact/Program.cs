@@ -24,24 +24,26 @@ namespace ABReact
 
                 var ctx = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                List<User> users = new List<User>();
-
                 await ctx.Database.EnsureCreatedAsync();
 
                 if (!ctx.Users.Any())
                 {
                     for (int i = 0; i < 20; i++)
                     {
-                        users.Add(new User
+                        string created = RandomDay(new DateTime(2010, 1, 1), DateTime.Now).ToString("dd.MM.yyyy");
+                        string lastActivity = RandomDay(DateTime.Parse(created), new DateTime(2021, 12, 1))
+                            .ToString("dd.MM.yyyy");
+                        var user = new User
                         {
-                            UserId = i + 1,
-                            Created = RandomDay(new DateTime(2010, 1, 1), new DateTime(2018, 1, 1)),
-                            LastActivity = RandomDay(new DateTime(2019, 1, 1), new DateTime(2021, 1, 1)),
-                        });
+                            Created = created,
+                            LastActivity = lastActivity,
+
+                        };
+
+                        await ctx.AddAsync(user);
+                        await ctx.SaveChangesAsync();
                     }
 
-                    await ctx.AddRangeAsync(users);
-                    await ctx.SaveChangesAsync();
                 }
 
             }
@@ -54,10 +56,17 @@ namespace ABReact
         }
         private static DateTime RandomDay(DateTime start, DateTime end)
         {
+            int range = 0;
             Random gen = new Random();
-            //DateTime start = new DateTime(2010, 1, 1);
-            //int range = (DateTime.Today - start).Days;
-            int range = (end - start).Days;
+            
+            if ((end - start).Days != 0)
+            {
+                range = (end - start).Days;
+            }
+            else
+            {
+                range = 7;
+            }
             return start.AddDays(gen.Next(range));
         }
 

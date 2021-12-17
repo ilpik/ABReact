@@ -5,7 +5,6 @@ import { Home } from "./components/Home";
 import { FetchData } from "./components/FetchData";
 import { Counter } from "./components/Counter";
 import { UsersTable } from "./components/UsersTable";
-import { User } from "./components/User/User.js";
 
 import "./custom.css";
 
