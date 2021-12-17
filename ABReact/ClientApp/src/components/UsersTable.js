@@ -1,77 +1,99 @@
-﻿import React, { Component } from "react";
-import User from "./User/User";
+﻿import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import User from './User/User';
+import Chart from 'react-google-charts';
 
-export class UsersTable extends Component {
-  static displayName = UsersTable.name;
+const UsersTable = () => {
+  const [users, setUsers] = useState([]);
+  const [histogramData, setHistogramData] = useState(['users amount', 'lifespan'])
+  const loading = users.length === 0;
 
-  constructor(props) {
-    super(props);
-    this.state = { users: [], loading: true };
-  }
+  useEffect(() => {
+    getUsers();
+    getCalculations();
+  }, []);
 
-  componentDidMount() {
-    this.GetUsers();
-  }
-  handleChange(event) {
-    this.setState({ users: event.target.value });
-  }
-  handleSubmit(e) {
+  const getCalculations = () => {
+    axios.get('/calculation').then((res) => console.log(res));
+  };
+  useEffect(() => {
+    
+  }, [])
+  const onInputValuesChange = (type, date, userId) => {
+    const selectedUserIndex = users.findIndex((item) => item.userId === userId);
+    const newUserObj = { ...users[selectedUserIndex], [type]: date };
+    const newUsers = [...users.slice().splice(selectedUserIndex, 1, newUserObj)];
+    setUsers(newUsers);
+    // setState({ users: event.target.value });
+  };
+  const getUsers = () => {
+    axios.get('/user').then((res) => setUsers(res.data));
+  };
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Отправлена форма.");
-  }
-  static renderTable(users) {
+    console.log('Отправлена форма.');
+  };
+  const handleAddUser = () => {
+    setUsers([...users, { id: users[users.length - 1].userId + 1, created: new Date(), lastActivity: new Date() }]);
+  };
+  const handleSave = () => {
+    axios.post('/user', users).then((res) => console.log(res));
+  };
+  const getHistogramData = () => 
+ 
+  console.log(histogramData);
+  if (loading) {
     return (
       <div>
-        <button onClick={() => console.log("1")}>+1+</button>
-        <form onSubmit={this.handleSubmit}>
-          <input type="submit" value="Save" />
-          <table className="table table-striped" aria-labelledby="tabelLabel">
+        <h1 id='tabelLabel'>Users</h1>
+        <p>This component demonstrates fetching data from the server.</p>
+        <p>
+          <em>Loading...</em>
+        </p>
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <button onClick={handleAddUser}>Add user</button>
+        <form onSubmit={handleSubmit}>
+          <div onClick={handleSave}>Save</div>
+          <table className='table table-striped' aria-labelledby='tabelLabel'>
             <thead>
               <tr>
                 <th>UserID</th>
                 <th>Date Registration</th>
                 <th>Date Last Activity</th>
-                            <th>LifeSpan</th>
-                            </tr>
+              </tr>
             </thead>
             <tbody>
               {users.map((user) => (
                 <User
                   key={user.userId}
+                  onInputValuesChange={onInputValuesChange}
                   userId={user.userId}
                   created={user.created}
                   lastActivity={user.lastActivity}
-                      lifeSpan = {user.lifeSpan}
-                          />
+                />
               ))}
             </tbody>
           </table>
         </form>
+        <Chart
+          width={'500px'}
+          height={'300px'}
+          chartType='Histogram'
+          loader={<div>Loading Chart</div>}
+          data={histogramData}
+          options={{
+            title: 'Lengths of dinosaurs, in meters',
+            legend: { position: 'none' },
+          }}
+          rootProps={{ 'data-testid': '1' }}
+        />
       </div>
     );
   }
+};
 
-  render() {
-    let contents = this.state.loading ? (
-      <p>
-        <em>Loading...</em>
-      </p>
-    ) : (
-      UsersTable.renderTable(this.state.users)
-    );
-
-    return (
-      <div>
-        <h1 id="tabelLabel">Users</h1>
-        <p>This component demonstrates fetching data from the server.</p>
-        {contents}
-      </div>
-    );
-  }
-
-  async GetUsers() {
-    const response = await fetch("user");
-    const data = await response.json();
-    this.setState({ users: data, loading: false });
-  }
-}
+export default UsersTable;
