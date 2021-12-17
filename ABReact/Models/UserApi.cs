@@ -8,12 +8,18 @@ using System.Threading.Tasks;
 
 namespace ABReact.Models
 {
-    public class User
+    public class UserApi
     {
-        [Key]
         public int UserId { get; set; }
+        
+        [Required]
+        [DataType(DataType.Date)]
         public DateTime Created { get; set; }
+        
+        [Required]
+        [DataType(DataType.Date)]
         public DateTime LastActivity { get; set; }
 
+        public int LifeSpan { get; set; }
     }
 }

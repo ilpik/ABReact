@@ -30,9 +30,8 @@ namespace ABReact
                 {
                     for (int i = 0; i < 20; i++)
                     {
-                        string created = RandomDay(new DateTime(2010, 1, 1), DateTime.Now).ToString("dd.MM.yyyy");
-                        string lastActivity = RandomDay(DateTime.Parse(created), new DateTime(2021, 12, 1))
-                            .ToString("dd.MM.yyyy");
+                        DateTime created = RandomDay(new DateTime(2010, 1, 1), DateTime.Now);
+                        DateTime lastActivity = RandomDay(created, new DateTime(2021, 12, 1));
                         var user = new User
                         {
                             Created = created,

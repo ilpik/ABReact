@@ -27,25 +27,49 @@ namespace ABReact.Controllers
         }   
 
         [HttpGet]
-        public List<User> GetUsers()
+        public List<UserApi> GetUsers()
         {
-            return _ctx.Users.ToList();
+            List<User> users = _ctx.Users.ToList();
+            List<UserApi> usersApi = new List<UserApi>();
+            foreach (var user in users)
+            {
+                usersApi.Add(new UserApi
+                {
+                    UserId = user.UserId,
+                    Created = user.Created,
+                    LastActivity = user.LastActivity,
+                    LifeSpan = user.LastActivity.Subtract(user.Created).Days
+                });
+            }
+            return usersApi;
         }
+        
         [HttpPost]
-        public void PostUser(User user)
+        public void PostUser(List<UserApi> users)
         {
-            _ctx.Add(user);
+            foreach (var user in users)
+            {
+                if (user.UserId != 0)
+                {
+                    _ctx.Add(user);
+                }
+                else
+                {
+                    UpdateUser(user);
+                }
+            }
         }
+        
         [HttpPut]
-        public void UpdateUser(User user)
+        public void UpdateUser(UserApi user)
         {
             _ctx.Update(user);
         }
+
         [HttpDelete]
         public void RemoveUser(int id)
         {
             _ctx.Users.Remove(GetUser(id));
-
         }
 
         public Task<bool> SaveChangesAsync()

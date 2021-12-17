@@ -14,19 +14,20 @@ namespace ABReact.Services
     {
         private int _days = 1500;
 
-        private List<User> _usersRet;
-        public Calculation(List<User> users)
+        private IEnumerable<User> _usersRet;
+        public Calculation(IEnumerable<User> users)
         {
             _usersRet = users;
         }
+
         public float RollingRetention()
         {
             int uReturned = ReturnedOnXDay(_days);
             int uRegistrated = RegisteredXDaysAgo(_days);
 
-            float rollingRetentiom = ((float)uReturned / (float)uRegistrated)*100;
+            float rollingRetention = ((float)uReturned / (float)uRegistrated)*100;
 
-            return rollingRetentiom;
+            return rollingRetention;
         }
 
         private int RegisteredXDaysAgo(int x)
@@ -35,7 +36,7 @@ namespace ABReact.Services
 
             foreach (var user in _usersRet)
             {
-                    if(DateSubtract(DateTime.Parse(user.LastActivity), DateTime.Now)>=x)
+                    if(DateSubtract(user.LastActivity, DateTime.Now)>=x)
                     {
                         count++;
                     }
@@ -49,7 +50,7 @@ namespace ABReact.Services
 
             foreach (var user in _usersRet)
             {
-                if (DateSubtract(DateTime.Parse(user.Created), DateTime.Parse(user.LastActivity)) >= x)
+                if (DateSubtract(user.Created, user.LastActivity) >= x)
                 {
                     count++;
                 }

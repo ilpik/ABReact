@@ -31,17 +31,18 @@ export class UsersTable extends Component {
                 <th>UserID</th>
                 <th>Date Registration</th>
                 <th>Date Last Activity</th>
-              </tr>
+                            <th>LifeSpan</th>
+                            </tr>
             </thead>
             <tbody>
               {users.map((user) => (
                 <User
-                  key={user.id}
-                  id={user.id}
+                  key={user.userId}
                   userId={user.userId}
                   created={user.created}
                   lastActivity={user.lastActivity}
-                />
+                      lifeSpan = {user.lifeSpan}
+                          />
               ))}
             </tbody>
           </table>
