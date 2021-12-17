@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ABReact.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211217154630_init2")]
-    partial class init2
+    [Migration("20211217193218_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
