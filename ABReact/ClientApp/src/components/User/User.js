@@ -7,16 +7,19 @@ const user = (props) => {
       <td>
         <input
           type="datetime"
-          value={props.created}
+          value={new Date(props.created)}
           onChange={() => console.log("Добавить 1")}
         />
       </td>
       <td>
         <input
           type="datetime"
-          value={props.lastActivity}
+          value={new Date(props.lastActivity)}
           onChange={() => console.log("Добавить 2")}
         />
+      </td>
+      <td>
+        <input type="text" value={props.lifeSpan} />
       </td>
     </tr>
   );

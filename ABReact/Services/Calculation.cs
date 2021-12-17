@@ -14,7 +14,7 @@ namespace ABReact.Services
     {
         private int _days = 1500;
 
-        private IEnumerable<User> _usersRet;
+        private readonly IEnumerable<User> _usersRet;
         public Calculation(IEnumerable<User> users)
         {
             _usersRet = users;
