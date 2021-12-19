@@ -54,7 +54,7 @@ const UsersTable = () => {
     setNewUsers([
       ...newUsers,
       {
-        userId: users[users.length - 1].userId + 1,
+        userId: [...users, ...newUsers].length + 1,
         created: createdUserDate,
         lastActivity: createdUserDate,
         isAddedUser: true,
