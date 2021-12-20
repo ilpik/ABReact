@@ -1,21 +1,24 @@
-import React from "react";
+import React from 'react';
+import DatePicker from 'react-datepicker';
 
-const user = (props) => {
+const user = ({ userId, created, lastActivity, onInputValuesChange }) => {
+  const createdDate = new Date(created);
+  const activityDate = new Date(lastActivity);
   return (
     <tr>
-      <td>{props.userId}</td>
+      <td>{userId}</td>
       <td>
-        <input
-          type="datetime"
-          value={new Date(props.created)}
-          onChange={() => console.log("Добавить 1")}
+        <DatePicker
+          dateFormat={'dd.MM.yyyy'}
+          selected={createdDate}
+          onChange={(date) => onInputValuesChange('created', date, userId)}
         />
       </td>
       <td>
         <input
           type="datetime"
-          value={new Date(props.lastActivity)}
-          onChange={() => console.log("Добавить 2")}
+          value={props.lastActivity}
+          onChange={() => console.log("�������� 2")}
         />
       </td>
       <td>
