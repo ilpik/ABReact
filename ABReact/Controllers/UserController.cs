@@ -87,8 +87,9 @@ namespace ABReact.Controllers
                 }
                 else return BadRequest();
             }
-
             return await _ctx.Users.ToListAsync();
+
+
         }
 
         [HttpPut]
