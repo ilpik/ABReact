@@ -33,64 +33,42 @@ namespace ABReact.Controllers
                 return NotFound();
             }
 
-            return user;
-        }   
-
         [HttpGet]
         public async Task<ActionResult<List<UserApi>>> GetUsers()
         {
-            if (_ctx.Users.Any())
+            List<User> users = _ctx.Users.ToList();
+            List<UserApi> usersApi = new List<UserApi>();
+            foreach (var user in users)
             {
-                List<User> users = await _ctx.Users.ToListAsync();
-                List<UserApi> usersApi = new List<UserApi>();
-
-                foreach (var user in users)
+                usersApi.Add(new UserApi
                 {
-                    usersApi.Add(new UserApi
-                    {
-                        UserId = user.UserId,
-                        Created = user.Created,
-                        LastActivity = user.LastActivity,
-                        LifeSpan = user.LastActivity.Subtract(user.Created).Days
-                    });
-                }
-
-                return usersApi;
+                    UserId = user.UserId,
+                    Created = user.Created,
+                    LastActivity = user.LastActivity,
+                    LifeSpan = user.LastActivity.Subtract(user.Created).Days
+                });
             }
-            else
-            {
-                return NotFound();
-            }
-           
+            return usersApi;
         }
         
         [HttpPost]
-        public async Task<ActionResult<List<User>>> PostUser(List<UserApi> users)
+        public void PostUser(List<UserApi> users)
         {
-            foreach (var userDb in users.Select(user => new User
+            foreach (var user in users)
             {
-                UserId = user.UserId,
-                Created = user.Created,
-                LastActivity = user.LastActivity
-            }))
-            {
-                if (userDb.Created.CompareTo(userDb.LastActivity) != 1)
+                if (user.UserId != 0)
                 {
-                    if (userDb.UserId != 0)
-                    {
-                        await UpdateUser(userDb);
-                    }
-                    else
-                    {
-                        _ctx.Add(userDb);
-                    }
+                    _ctx.Add(user);
                 }
-                else return BadRequest();
+                else
+                {
+                    UpdateUser(user);
+                }
             }
 
             return await _ctx.Users.ToListAsync();
         }
-        
+
         [HttpPut]
         public async Task UpdateUser(User user)
         {
@@ -99,24 +77,14 @@ namespace ABReact.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> RemoveUser(int id)
+        public void RemoveUser(int id)
         {
-            var user= await _ctx.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            _ctx.Users.Remove(user);
-            await _ctx.SaveChangesAsync();
-
-            return NoContent();
+            _ctx.Users.Remove(GetUser(id));
         }
 
-        public async Task SaveChangesAsync()
+        public Task<bool> SaveChangesAsync()
         {
-            await _ctx.SaveChangesAsync();
+            throw new NotImplementedException();
         }
     }
 }
