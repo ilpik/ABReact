@@ -78,16 +78,15 @@ namespace ABReact.Controllers
                 {
                     if (userDb.UserId != 0)
                     {
-                        _ctx.Add(userDb);
+                        await UpdateUser(userDb);
                     }
                     else
                     {
-                        await UpdateUser(userDb);
+                        _ctx.Add(userDb);
                     }
                 }
                 else return BadRequest();
             }
-            await SaveChangesAsync();
 
             return await _ctx.Users.ToListAsync();
         }
