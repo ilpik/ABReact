@@ -5,7 +5,10 @@ import Chart from 'react-google-charts';
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
-  const [histogramData, setHistogramData] = useState(['users amount', 'lifespan'])
+  const [histogramData, setHistogramData] = useState([['userId', 'lifeSpan']]);
+  const [rollingRetention, setRollingRetention] = useState(null);
+  const [newUsers, setNewUsers] = useState([]);
+  const [changedUsersData, setChangedUsersData] = useState([]);
   const loading = users.length === 0;
 
   useEffect(() => {
@@ -13,35 +16,65 @@ const UsersTable = () => {
     getCalculations();
   }, []);
 
-  const getCalculations = () => {
-    axios.get('/calculation').then((res) => console.log(res));
-  };
-  useEffect(() => {
-    
-  }, [])
-  const onInputValuesChange = (type, date, userId) => {
-    const selectedUserIndex = users.findIndex((item) => item.userId === userId);
-    const newUserObj = { ...users[selectedUserIndex], [type]: date };
-    const newUsers = [...users.slice().splice(selectedUserIndex, 1, newUserObj)];
-    setUsers(newUsers);
-    // setState({ users: event.target.value });
-  };
   const getUsers = () => {
     axios.get('/user').then((res) => setUsers(res.data));
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Отправлена форма.');
+
+  const getCalculations = () => {
+    axios.get('/calculation').then((res) => setRollingRetention(res.data));
   };
+  const changeDataInObj = (obj, arr, type, date) => {
+    const selectedUserIndex = arr.findIndex((item) => item.userId === obj.userId);
+    const editedUsersArr = arr.map((item, index) => {
+      if (index === selectedUserIndex) {
+        return ({...item, [type]: date, isChangedUser: true, });
+      } 
+      return item
+    });
+    return editedUsersArr;
+  }
+  const onInputValuesChange = ({ type, date, userData }) => {
+    const newUsersArr = changeDataInObj(userData, users, type, date)
+    const newNewUsersArr = changeDataInObj(userData, newUsers, type, date)
+    setUsers(newUsersArr);
+    setNewUsers(newNewUsersArr)
+    const userIndexInChangedArr = changedUsersData.findIndex(item => item.userId === userData.userId);
+    const newChangedUsersDataArr = userIndexInChangedArr === -1 ? [...changedUsersData, userData] 
+    : changedUsersData.map((item, index) => {
+      if (index === userIndexInChangedArr) {
+        return ({...userData, [type]: date})
+      }
+      return item
+    } )
+    setChangedUsersData(newChangedUsersDataArr);
+  };
+
   const handleAddUser = () => {
-    setUsers([...users, { id: users[users.length - 1].userId + 1, created: new Date(), lastActivity: new Date() }]);
+    const createdUserDate = new Date();
+    setNewUsers([
+      ...newUsers,
+      {
+        userId: [...users, ...newUsers].length + 1,
+        created: createdUserDate,
+        lastActivity: createdUserDate,
+        isAddedUser: true,
+      },
+    ]);
   };
+
   const handleSave = () => {
-    axios.post('/user', users).then((res) => console.log(res));
+    axios.post('/user', [...changedUsersData, ...newUsers]).then((res) => {
+      setUsers(res.data)
+      setNewUsers([]);
+    });
   };
-  const getHistogramData = () => 
- 
-  console.log(histogramData);
+
+  const handleCalculate = () => {
+    if (users.length > 0) {
+      setHistogramData([...histogramData, ...users.map((item) => [item.userId, item.lifeSpan])]);
+    }
+  };
+
   if (loading) {
     return (
       <div>
@@ -56,8 +89,10 @@ const UsersTable = () => {
     return (
       <div>
         <button onClick={handleAddUser}>Add user</button>
-        <form onSubmit={handleSubmit}>
-          <div onClick={handleSave}>Save</div>
+        <button onClick={handleCalculate}>Calculate</button>
+        <button onClick={handleSave}>Save</button>
+        <div>Rolling Retention 7 day: {rollingRetention}</div>
+        <div>
           <table className='table table-striped' aria-labelledby='tabelLabel'>
             <thead>
               <tr>
@@ -67,26 +102,21 @@ const UsersTable = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <User
-                  key={user.userId}
-                  onInputValuesChange={onInputValuesChange}
-                  userId={user.userId}
-                  created={user.created}
-                  lastActivity={user.lastActivity}
-                />
-              ))}
+              {users.length > 0 &&
+                [...users, ...newUsers].map((user) => (
+                  <User key={user.userId} userData={user} onInputValuesChange={onInputValuesChange} />
+                ))}
             </tbody>
           </table>
-        </form>
+        </div>
         <Chart
-          width={'500px'}
-          height={'300px'}
+          width={'100%'}
+          height={'400px'}
           chartType='Histogram'
           loader={<div>Loading Chart</div>}
           data={histogramData}
           options={{
-            title: 'Lengths of dinosaurs, in meters',
+            title: 'Гистограмма распределения длительностей жизней пользователей ',
             legend: { position: 'none' },
           }}
           rootProps={{ 'data-testid': '1' }}
