@@ -1,28 +1,48 @@
-import React from 'react';
-import DatePicker from 'react-datepicker';
+import React from "react";
+import DatePicker from "react-datepicker";
 
-const user = ({ userId, created, lastActivity, onInputValuesChange }) => {
+const user = ({ userData, onInputValuesChange }) => {
+  const { userId, created, lastActivity, isAddedUser, isChangedUser } =
+    userData;
   const createdDate = new Date(created);
   const activityDate = new Date(lastActivity);
   return (
-    <tr>
+    <tr
+      style={
+        isAddedUser
+          ? { backgroundColor: "lightgreen" }
+          : isChangedUser
+          ? { backgroundColor: "orange" }
+          : {}
+      }
+    >
       <td>{userId}</td>
       <td>
         <DatePicker
-          dateFormat={'dd.MM.yyyy'}
+          dateFormat={"dd.MM.yyyy"}
           selected={createdDate}
-          onChange={(date) => onInputValuesChange('created', date, userId)}
+          onChange={(date) =>
+            onInputValuesChange({
+              type: "created",
+              date: new Date(date),
+              userData,
+            })
+          }
         />
       </td>
       <td>
-        <input
-          type="datetime"
-          value={props.lastActivity}
-          onChange={() => console.log("Добавить 2")}
+        <DatePicker
+          minDate={createdDate}
+          dateFormat={"dd.MM.yyyy"}
+          selected={activityDate}
+          onChange={(date) =>
+            onInputValuesChange({
+              type: "lastActivity",
+              date: new Date(date),
+              userData,
+            })
+          }
         />
-      </td>
-      <td>
-        <input type="text" value={props.lifeSpan} />
       </td>
     </tr>
   );

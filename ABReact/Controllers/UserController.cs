@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ABReact.Data;
 using ABReact.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace ABReact.Controllers
@@ -20,61 +21,103 @@ namespace ABReact.Controllers
         {
             _ctx = ctx;
         }
+
         [HttpGet("id")]
-        public User GetUser(int id)
+        public async Task<ActionResult<User>> GetUser(int id)
         {
-            return _ctx.Users.FirstOrDefault(x => x.UserId == id);
+
+            var user = await _ctx.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return user;
         }   
 
         [HttpGet]
-        public List<UserApi> GetUsers()
+        public async Task<ActionResult<List<UserApi>>> GetUsers()
         {
-            List<User> users = _ctx.Users.ToList();
-            List<UserApi> usersApi = new List<UserApi>();
-            foreach (var user in users)
+            if (_ctx.Users.Any())
             {
-                usersApi.Add(new UserApi
+                List<User> users = await _ctx.Users.ToListAsync();
+                List<UserApi> usersApi = new List<UserApi>();
+
+                foreach (var user in users)
                 {
-                    UserId = user.UserId,
-                    Created = user.Created,
-                    LastActivity = user.LastActivity,
-                    LifeSpan = user.LastActivity.Subtract(user.Created).Days
-                });
+                    usersApi.Add(new UserApi
+                    {
+                        UserId = user.UserId,
+                        Created = user.Created,
+                        LastActivity = user.LastActivity,
+                        LifeSpan = user.LastActivity.Subtract(user.Created).Days
+                    });
+                }
+
+                return usersApi;
             }
-            return usersApi;
+            else
+            {
+                return NotFound();
+            }
+           
         }
         
         [HttpPost]
-        public void PostUser(List<UserApi> users)
+        public async Task<ActionResult<List<User>>> PostUser(List<UserApi> users)
         {
-            foreach (var user in users)
+            foreach (var userDb in users.Select(user => new User
             {
-                if (user.UserId != 0)
+                UserId = user.UserId,
+                Created = user.Created,
+                LastActivity = user.LastActivity
+            }))
+            {
+                if (userDb.Created.CompareTo(userDb.LastActivity) != 1)
                 {
-                    _ctx.Add(user);
+                    if (userDb.UserId != 0)
+                    {
+                        _ctx.Add(userDb);
+                    }
+                    else
+                    {
+                        await UpdateUser(userDb);
+                    }
                 }
-                else
-                {
-                    UpdateUser(user);
-                }
+                else return BadRequest();
             }
+            await SaveChangesAsync();
+
+            return await _ctx.Users.ToListAsync();
         }
         
         [HttpPut]
-        public void UpdateUser(UserApi user)
+        public async Task UpdateUser(User user)
         {
             _ctx.Update(user);
+            await SaveChangesAsync();
         }
 
         [HttpDelete]
-        public void RemoveUser(int id)
+        public async Task<IActionResult> RemoveUser(int id)
         {
-            _ctx.Users.Remove(GetUser(id));
+            var user= await _ctx.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _ctx.Users.Remove(user);
+            await _ctx.SaveChangesAsync();
+
+            return NoContent();
         }
 
-        public Task<bool> SaveChangesAsync()
+        public async Task SaveChangesAsync()
         {
-            throw new NotImplementedException();
+            await _ctx.SaveChangesAsync();
         }
     }
 }

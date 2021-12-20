@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Route } from "react-router";
 import { Layout } from "./components/Layout";
-import UsersTable from "./components/UsersTable";
+import UsersTable from "./components/User/UsersTable";
 
-import 'react-datepicker/dist/react-datepicker.css';
+import "react-datepicker/dist/react-datepicker.css";
 
 import "./custom.css";
 
