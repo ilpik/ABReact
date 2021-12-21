@@ -76,7 +76,8 @@ const UsersTable = () => {
   };
 
   const handleSave = () => {
-    const payload = [...changedUsersData.map((item) => ({ ...item, isChangedUser: undefined })), ...newUsers.map((item) => ({ ...item, isNewUser: undefined, userId: 0 }))];
+    const payload = [...changedUsersData.map(({isChangedUser, ...rest}) => rest), ...newUsers.map(({isNewUser, ...rest}) => ({...rest, userId: 0}))];
+    console.log(payload);
     axios.post('/user', payload).then((res) => {
       setUsers(res.data);
       setNewUsers([]);
