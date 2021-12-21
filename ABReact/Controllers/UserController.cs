@@ -83,6 +83,7 @@ namespace ABReact.Controllers
                     else
                     {
                         _ctx.Add(userDb);
+                        await SaveChangesAsync();
                     }
                 }
                 else return BadRequest();

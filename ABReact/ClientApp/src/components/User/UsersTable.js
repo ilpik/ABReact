@@ -1,11 +1,11 @@
-﻿import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import User from './User';
-import Chart from 'react-google-charts';
+﻿import axios from "axios";
+import React, { useEffect, useState } from "react";
+import User from "./User";
+import Chart from "react-google-charts";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
-  const [histogramData, setHistogramData] = useState([['userId', 'lifeSpan']]);
+  const [histogramData, setHistogramData] = useState([["userId", "lifeSpan"]]);
   const [rollingRetention, setRollingRetention] = useState(null);
   const [newUsers, setNewUsers] = useState([]);
   const [changedUsersData, setChangedUsersData] = useState([]);
@@ -17,11 +17,11 @@ const UsersTable = () => {
   }, []);
 
   const getUsers = () => {
-    axios.get('/user').then((res) => setUsers(res.data));
+    axios.get("/user").then((res) => setUsers(res.data));
   };
 
   const getCalculations = () => {
-    axios.get('/calculation').then((res) => setRollingRetention(res.data));
+    axios.get("/calculation").then((res) => setRollingRetention(res.data));
   };
 
   const onDateChange = ({ type, date, userData }) => {
@@ -50,7 +50,10 @@ const UsersTable = () => {
         })
       );
     } else {
-      const newArr = [...changedUsersData, { ...userData, [type]: date, isChangedUser: true }];
+      const newArr = [
+        ...changedUsersData,
+        { ...userData, [type]: date, isChangedUser: true },
+      ];
       setChangedUsersData(newArr);
       setUsers(
         users.map((item) => {
@@ -67,7 +70,14 @@ const UsersTable = () => {
     setNewUsers([
       ...newUsers,
       {
-        userId: [...users, ...newUsers].length + 1,
+        // userId: [...users, ...newUsers].length + 1,
+        userId:
+          Math.max.apply(
+            Math,
+            [...users, ...newUsers].map(function (o) {
+              return o.userId;
+            })
+          ) + 1,
         created: new Date(),
         lastActivity: new Date(),
         isNewUser: true,
@@ -76,27 +86,33 @@ const UsersTable = () => {
   };
 
   const handleSave = () => {
-    const payload = [...changedUsersData.map(({isChangedUser, ...rest}) => rest), ...newUsers.map(({isNewUser, ...rest}) => ({...rest, userId: 0}))];
+    const payload = [
+      ...changedUsersData.map(({ isChangedUser, ...rest }) => rest),
+      ...newUsers.map(({ isNewUser, ...rest }) => ({ ...rest, userId: 0 })),
+    ];
     console.log(payload);
-    axios.post('/user', payload).then((res) => {
+    axios.post("/user", payload).then((res) => {
       setUsers(res.data);
       setNewUsers([]);
-      setChangedUsersData([])
+      setChangedUsersData([]);
     });
   };
 
   const handleCalculate = () => {
     if (users.length > 0) {
-      setHistogramData([...histogramData, ...users.map((item) => [item.userId, item.lifeSpan])]);
+      setHistogramData([
+        ...histogramData,
+        ...users.map((item) => [item.userId, item.lifeSpan]),
+      ]);
     }
   };
 
   const renderArr = [...users, ...newUsers];
-  
+
   if (loading) {
     return (
       <div>
-        <h1 id='tabelLabel'>Users</h1>
+        <h1 id="tabelLabel">Users</h1>
         <p>This component demonstrates fetching data from the server.</p>
         <p>
           <em>Loading...</em>
@@ -106,17 +122,29 @@ const UsersTable = () => {
   } else {
     return (
       <div>
-        <button type='button' className='btn btn-primary col-3' onClick={handleAddUser}>
+        <button
+          type="button"
+          className="btn btn-primary col-3"
+          onClick={handleAddUser}
+        >
           Add user
         </button>
-        <button type='button' className='btn btn-primary col-3' onClick={handleCalculate}>
+        <button
+          type="button"
+          className="btn btn-primary col-3"
+          onClick={handleCalculate}
+        >
           Calculate
         </button>
-        <button type='button' className='btn btn-primary col-3' onClick={handleSave}>
+        <button
+          type="button"
+          className="btn btn-primary col-3"
+          onClick={handleSave}
+        >
           Save
         </button>
         <div>
-          <table className='table table-striped' aria-labelledby='tabelLabel'>
+          <table className="table table-striped" aria-labelledby="tabelLabel">
             <thead>
               <tr>
                 <th>UserID</th>
@@ -126,7 +154,13 @@ const UsersTable = () => {
             </thead>
             <tbody>
               {renderArr.length > 0 &&
-                renderArr.map((user, index) => <User key={user.userId} userData={user} onDateChange={onDateChange} />)}
+                renderArr.map((user, index) => (
+                  <User
+                    key={user.userId}
+                    userData={user}
+                    onDateChange={onDateChange}
+                  />
+                ))}
             </tbody>
           </table>
         </div>
@@ -135,16 +169,17 @@ const UsersTable = () => {
         </div>
 
         <Chart
-          width={'100%'}
-          height={'400px'}
-          chartType='Histogram'
+          width={"100%"}
+          height={"400px"}
+          chartType="Histogram"
           loader={<div>Loading Chart</div>}
           data={histogramData}
           options={{
-            title: 'Гистограмма распределения длительностей жизней пользователей ',
-            legend: { position: 'none' },
+            title:
+              "Гистограмма распределения длительностей жизней пользователей ",
+            legend: { position: "none" },
           }}
-          rootProps={{ 'data-testid': '1' }}
+          rootProps={{ "data-testid": "1" }}
         />
       </div>
     );
