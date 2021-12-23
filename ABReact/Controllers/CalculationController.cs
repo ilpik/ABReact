@@ -22,7 +22,7 @@ namespace ABReact.Controllers
         }
 
         [HttpGet]
-        public float GetRollRet()
+        public double GetRollRet()
         {
             return new Calculation(_users).RollingRetention();
         }

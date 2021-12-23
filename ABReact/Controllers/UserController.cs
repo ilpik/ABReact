@@ -59,7 +59,7 @@ namespace ABReact.Controllers
             }
             else
             {
-                return NotFound();
+                return Ok("Список пуст");
             }
 
         }
@@ -101,19 +101,20 @@ namespace ABReact.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> RemoveUser(int id)
+        public async Task<ActionResult<List<UserApi>>> DeleteUser(int id)
         {
             var user = await _ctx.Users.FindAsync(id);
 
             if (user == null)
             {
-                return NotFound();
+                return NotFound("Ошибка");
             }
 
             _ctx.Users.Remove(user);
             await _ctx.SaveChangesAsync();
 
-            return NoContent();
+            return await GetUsers();
+
         }
 
         public async Task SaveChangesAsync()

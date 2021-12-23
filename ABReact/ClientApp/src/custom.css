@@ -1,4 +1,14 @@
 /* Provide sufficient contrast against white background */
+* {
+  font-family: "Ubuntu", sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 16px;
+  color: #5d6e97;
+}
+body {
+  background-color: #f9f9f9;
+}
 a {
   color: #0366d6;
 }
@@ -7,9 +17,23 @@ code {
   color: #e01a76;
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-  margin: 5px;
+.button {
+  margin: 0 15px 15px 15px;
+  border-radius: 10px;
+}
+
+.table-custom {
+  background-color: white;
+  filter: drop-shadow(4px 0px 10px rgba(93, 109, 151, 0.1));
+  text-align: center;
+  border-radius: 10px;
+}
+table th {
+  color: #5d6d97 !important;
+  opacity: 0.4;
+}
+
+table input {
+  background-color: rgba(255, 255, 255, 0);
+  border: none;
 }

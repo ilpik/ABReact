@@ -10,10 +10,11 @@ const UsersTable = () => {
   const [newUsers, setNewUsers] = useState([]);
   const [changedUsersData, setChangedUsersData] = useState([]);
   const loading = users.length === 0;
-
   useEffect(() => {
     getUsers();
     getCalculations();
+
+    console.log(React.version);
   }, []);
 
   const getUsers = () => {
@@ -70,7 +71,6 @@ const UsersTable = () => {
     setNewUsers([
       ...newUsers,
       {
-        // userId: [...users, ...newUsers].length + 1,
         userId:
           Math.max.apply(
             Math,
@@ -92,9 +92,21 @@ const UsersTable = () => {
     ];
     console.log(payload);
     axios.post("/user", payload).then((res) => {
-      setUsers(res.data);
+      console.log(res.data);
       setNewUsers([]);
+      setUsers(res.data);
       setChangedUsersData([]);
+    });
+  };
+
+  const onRemoveUser = (id) => {
+    console.log(id);
+
+    axios.delete("/user?id=" + id).then((res) => {
+      console.log(res.data);
+      setUsers(res.data);
+      // setNewUsers([]);
+      // setChangedUsersData([]);
     });
   };
 
@@ -124,50 +136,54 @@ const UsersTable = () => {
       <div>
         <button
           type="button"
-          className="btn btn-primary col-3"
+          className="uk-button uk-button-primary button"
           onClick={handleAddUser}
         >
           Add user
         </button>
         <button
           type="button"
-          className="btn btn-primary col-3"
+          className="uk-button uk-button-primary button"
           onClick={handleCalculate}
         >
           Calculate
         </button>
         <button
           type="button"
-          className="btn btn-primary col-3"
+          className="uk-button uk-button-primary button"
           onClick={handleSave}
         >
           Save
         </button>
         <div>
-          <table className="table table-striped" aria-labelledby="tabelLabel">
+          <table
+            className="uk-table uk-table-divider uk-table-hover table-custom "
+            aria-labelledby="tabelLabel"
+          >
             <thead>
               <tr>
                 <th>UserID</th>
                 <th>Date Registration</th>
                 <th>Date Last Activity</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {renderArr.length > 0 &&
                 renderArr.map((user, index) => (
                   <User
-                    key={user.userId}
+                    key={"user-" + user.userId}
                     userData={user}
                     onDateChange={onDateChange}
+                    onRemoveUser={onRemoveUser}
                   />
                 ))}
             </tbody>
           </table>
         </div>
         <div>
-          <b>Rolling Retention 7 day:</b> {rollingRetention}
+          <b>Rolling Retention 7 day:</b> {rollingRetention} %
         </div>
-
         <Chart
           width={"100%"}
           height={"400px"}

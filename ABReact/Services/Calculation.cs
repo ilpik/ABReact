@@ -20,14 +20,15 @@ namespace ABReact.Services
             _usersRet = users;
         }
 
-        public float RollingRetention()
+        public double RollingRetention()
         {
             int uReturned = ReturnedOnXDay(_days);
             int uRegistrated = RegisteredXDaysAgo(_days);
 
             float rollingRetention = ((float)uReturned / (float)uRegistrated)*100;
+            var resp = Math.Round(rollingRetention, 2);
 
-            return rollingRetention;
+            return resp;
         }
 
         private int RegisteredXDaysAgo(int x)
