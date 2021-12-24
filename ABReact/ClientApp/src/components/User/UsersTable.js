@@ -100,13 +100,13 @@ const UsersTable = () => {
   };
 
   const onRemoveUser = (id) => {
-    console.log(id);
-
     axios.delete("/user?id=" + id).then((res) => {
-      console.log(res.data);
-      setUsers(res.data);
-      // setNewUsers([]);
-      // setChangedUsersData([]);
+      const changedUserIds = changedUsersData.reduce((acc, i) => {
+        acc[i.userId] = i
+        return acc;
+      }, {})
+      const newArr = res.data.map(item => changedUserIds[item.userId] ? changedUserIds[item.userId] : item)
+      setUsers(newArr);
     });
   };
 
@@ -184,7 +184,12 @@ const UsersTable = () => {
         <div>
           <b>Rolling Retention 7 day:</b> {rollingRetention} %
         </div>
+        <div>
         <Chart
+          style={{
+            zIndex: '-1',
+            position: 'absolute'
+          }}
           width={"100%"}
           height={"400px"}
           chartType="Histogram"
@@ -197,6 +202,8 @@ const UsersTable = () => {
           }}
           rootProps={{ "data-testid": "1" }}
         />
+        </div>
+        
       </div>
     );
   }
