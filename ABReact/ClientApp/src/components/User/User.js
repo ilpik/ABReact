@@ -1,7 +1,7 @@
 import React from "react";
 import DatePicker from "react-datepicker";
 
-const user = ({ userData, onDateChange, onRemoveUser }) => {
+const User = ({ userData, onDateChange, onRemoveUser }) => {
   const { userId, created, lastActivity, isNewUser, isChangedUser } = userData;
   const createdDate = new Date(created);
   const activityDate = new Date(lastActivity);
@@ -50,4 +50,4 @@ const user = ({ userData, onDateChange, onRemoveUser }) => {
   );
 };
 
-export default user;
+export default User;

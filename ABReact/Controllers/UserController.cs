@@ -59,7 +59,7 @@ namespace ABReact.Controllers
             }
             else
             {
-                return Ok("Список пуст");
+                return null;
             }
 
         }
