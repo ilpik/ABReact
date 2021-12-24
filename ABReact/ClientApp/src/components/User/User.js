@@ -16,7 +16,8 @@ const User = ({ userData, onDateChange, onRemoveUser }) => {
       }
     >
       <td>{userId}</td>
-      <td style={{ position: "relative" }}>
+      <td>
+        <div style={{ position: "relative" }}>
         <DatePicker
           dateFormat={"dd.MM.yyyy"}
           selected={createdDate}
@@ -24,6 +25,7 @@ const User = ({ userData, onDateChange, onRemoveUser }) => {
             onDateChange({ type: "created", date: new Date(date), userData })
           }
         />
+        </div>
       </td>
       <td style={{ position: "relative" }}>
         <DatePicker
@@ -39,12 +41,12 @@ const User = ({ userData, onDateChange, onRemoveUser }) => {
           }
         />
       </td>
-      <td>
-        <i
+       <td>
+       {!userData.isNewUser &&<i
           uk-icon="icon: trash"
           style={{ fontSize: "16px" }}
           onClick={() => onRemoveUser(userId)}
-        ></i>
+        ></i>}
       </td>
     </tr>
   );

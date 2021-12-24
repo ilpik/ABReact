@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import User from './User';
 import Chart from 'react-google-charts';
-
+const histogramHeadings = ['userId', 'lifeSpan']
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
-  const [histogramData, setHistogramData] = useState([['userId', 'lifeSpan']]);
+  const [histogramData, setHistogramData] = useState([histogramHeadings]);
   const [rollingRetention, setRollingRetention] = useState(null);
   const [newUsers, setNewUsers] = useState([]);
   const [changedUsersData, setChangedUsersData] = useState([]);
@@ -14,7 +14,6 @@ const UsersTable = () => {
   useEffect(() => {
     getUsers();
     getCalculations();
-    console.log(React.version);
   }, []);
   const getUsers = () => {
     axios.get('/user').then((res) => {
@@ -93,9 +92,7 @@ const UsersTable = () => {
       ...changedUsersData.map(({ isChangedUser, ...rest }) => rest),
       ...newUsers.map(({ isNewUser, ...rest }) => ({ ...rest, userId: 0 })),
     ];
-    console.log(payload);
     axios.post('/user', payload).then((res) => {
-      console.log(res.data);
       setNewUsers([]);
       setUsers(res.data);
       setChangedUsersData([]);
@@ -103,20 +100,21 @@ const UsersTable = () => {
   };
 
   const onRemoveUser = (id) => {
-    console.log(id);
-
     axios.delete('/user?id=' + id).then((res) => {
-      console.log(res.data);
-      setUsers(res.data);
-      // setNewUsers([]);
-      // setChangedUsersData([]);
+      const changedUserIds = changedUsersData?.reduce((acc, i) => {
+        acc[i.userId] = i;
+        return acc;
+      }, {});
+      const newArr =
+        res.data.length > 0
+          ? res.data?.map((item) => (changedUserIds[item.userId] ? changedUserIds[item.userId] : item))
+          : [];
+      setUsers(newArr);
     });
   };
 
   const handleCalculate = () => {
-    if (users.length > 0) {
-      setHistogramData([...histogramData, ...users.map((item) => [item.userId, item.lifeSpan])]);
-    }
+      setHistogramData([histogramHeadings, ...users.map((item) => [item.userId, item.lifeSpan])]);
   };
 
   const renderArr = [...users, ...newUsers];
@@ -171,20 +169,22 @@ const UsersTable = () => {
         </table>
       </div>
       <div className='uk-margin-medium-bottom'>
-        <b>Rolling Retention 7 day:</b> {rollingRetention} %
+        <b>Rolling Retention 7 day:</b> {rollingRetention ? `${rollingRetention}%` : 'Press calculate to get data'}
       </div>
-      <Chart
-        width={'100%'}
-        height={'400px'}
-        chartType='Histogram'
-        loader={<div>Loading Chart</div>}
-        data={histogramData}
-        options={{
-          title: 'Гистограмма распределения длительностей жизней пользователей ',
-          legend: { position: 'none' },
-        }}
-        rootProps={{ 'data-testid': '1' }}
-      />
+      <div>
+        <Chart
+          width={'100%'}
+          height={'400px'}
+          chartType='Histogram'
+          loader={<div>Loading Chart</div>}
+          data={histogramData}
+          options={{
+            title: 'Гистограмма распределения длительностей жизней пользователей ',
+            legend: { position: 'none' },
+          }}
+          rootProps={{ 'data-testid': '1' }}
+        />
+      </div>
     </div>
   );
 };
