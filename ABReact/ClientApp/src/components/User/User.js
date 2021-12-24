@@ -1,7 +1,7 @@
 import React from "react";
 import DatePicker from "react-datepicker";
 
-const user = ({ userData, onDateChange, onRemoveUser }) => {
+const User = ({ userData, onDateChange, onRemoveUser }) => {
   const { userId, created, lastActivity, isNewUser, isChangedUser } = userData;
   const createdDate = new Date(created);
   const activityDate = new Date(lastActivity);
@@ -16,7 +16,8 @@ const user = ({ userData, onDateChange, onRemoveUser }) => {
       }
     >
       <td>{userId}</td>
-      <td style={{ position: "relative" }}>
+      <td>
+        <div style={{ position: "relative" }}>
         <DatePicker
           dateFormat={"dd.MM.yyyy"}
           selected={createdDate}
@@ -24,6 +25,7 @@ const user = ({ userData, onDateChange, onRemoveUser }) => {
             onDateChange({ type: "created", date: new Date(date), userData })
           }
         />
+        </div>
       </td>
       <td style={{ position: "relative" }}>
         <DatePicker
@@ -39,15 +41,15 @@ const user = ({ userData, onDateChange, onRemoveUser }) => {
           }
         />
       </td>
-      <td>
-        <i
+       <td>
+       {!userData.isNewUser &&<i
           uk-icon="icon: trash"
           style={{ fontSize: "16px" }}
           onClick={() => onRemoveUser(userId)}
-        ></i>
+        ></i>}
       </td>
     </tr>
   );
 };
 
-export default user;
+export default User;
