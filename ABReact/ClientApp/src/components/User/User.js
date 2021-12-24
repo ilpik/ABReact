@@ -21,6 +21,7 @@ const User = ({ userData, onDateChange, onRemoveUser }) => {
         <DatePicker
           dateFormat={"dd.MM.yyyy"}
           selected={createdDate}
+          popperPlacement="top-end"
           onChange={(date) =>
             onDateChange({ type: "created", date: new Date(date), userData })
           }
@@ -32,6 +33,7 @@ const User = ({ userData, onDateChange, onRemoveUser }) => {
           minDate={createdDate}
           dateFormat={"dd.MM.yyyy"}
           selected={activityDate}
+          popperPlacement="top-end"
           onChange={(date) =>
             onDateChange({
               type: "lastActivity",

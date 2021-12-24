@@ -1,28 +1,31 @@
-﻿import axios from "axios";
-import React, { useEffect, useState } from "react";
-import User from "./User";
-import Chart from "react-google-charts";
-
+﻿import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import User from './User';
+import Chart from 'react-google-charts';
+const histogramHeadings = ['userId', 'lifeSpan']
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
-  const [histogramData, setHistogramData] = useState([["userId", "lifeSpan"]]);
+  const [histogramData, setHistogramData] = useState([histogramHeadings]);
   const [rollingRetention, setRollingRetention] = useState(null);
   const [newUsers, setNewUsers] = useState([]);
   const [changedUsersData, setChangedUsersData] = useState([]);
-  const loading = users.length === 0;
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     getUsers();
     getCalculations();
-
-    console.log(React.version);
   }, []);
-
   const getUsers = () => {
-    axios.get("/user").then((res) => setUsers(res.data));
+    axios.get('/user').then((res) => {
+      setIsLoading(false);
+      setUsers(res.data);
+    });
   };
 
   const getCalculations = () => {
-    axios.get("/calculation").then((res) => setRollingRetention(res.data));
+    axios.get('/calculation').then((res) => {
+      setRollingRetention(res.data);
+    });
   };
 
   const onDateChange = ({ type, date, userData }) => {
@@ -51,10 +54,7 @@ const UsersTable = () => {
         })
       );
     } else {
-      const newArr = [
-        ...changedUsersData,
-        { ...userData, [type]: date, isChangedUser: true },
-      ];
+      const newArr = [...changedUsersData, { ...userData, [type]: date, isChangedUser: true }];
       setChangedUsersData(newArr);
       setUsers(
         users.map((item) => {
@@ -72,12 +72,14 @@ const UsersTable = () => {
       ...newUsers,
       {
         userId:
-          Math.max.apply(
-            Math,
-            [...users, ...newUsers].map(function (o) {
-              return o.userId;
-            })
-          ) + 1,
+          newUsers.length === 0
+            ? 1
+            : Math.max.apply(
+                Math,
+                [...users, ...newUsers].map(function (o) {
+                  return o.userId;
+                })
+              ) + 1,
         created: new Date(),
         lastActivity: new Date(),
         isNewUser: true,
@@ -90,9 +92,7 @@ const UsersTable = () => {
       ...changedUsersData.map(({ isChangedUser, ...rest }) => rest),
       ...newUsers.map(({ isNewUser, ...rest }) => ({ ...rest, userId: 0 })),
     ];
-    console.log(payload);
-    axios.post("/user", payload).then((res) => {
-      console.log(res.data);
+    axios.post('/user', payload).then((res) => {
       setNewUsers([]);
       setUsers(res.data);
       setChangedUsersData([]);
@@ -100,113 +100,93 @@ const UsersTable = () => {
   };
 
   const onRemoveUser = (id) => {
-    axios.delete("/user?id=" + id).then((res) => {
-      const changedUserIds = changedUsersData.reduce((acc, i) => {
-        acc[i.userId] = i
+    axios.delete('/user?id=' + id).then((res) => {
+      const changedUserIds = changedUsersData?.reduce((acc, i) => {
+        acc[i.userId] = i;
         return acc;
-      }, {})
-      const newArr = res.data.map(item => changedUserIds[item.userId] ? changedUserIds[item.userId] : item)
+      }, {});
+      const newArr =
+        res.data.length > 0
+          ? res.data?.map((item) => (changedUserIds[item.userId] ? changedUserIds[item.userId] : item))
+          : [];
       setUsers(newArr);
     });
   };
 
   const handleCalculate = () => {
-    if (users.length > 0) {
-      setHistogramData([
-        ...histogramData,
-        ...users.map((item) => [item.userId, item.lifeSpan]),
-      ]);
-    }
+      setHistogramData([histogramHeadings, ...users.map((item) => [item.userId, item.lifeSpan])]);
   };
 
   const renderArr = [...users, ...newUsers];
-
-  if (loading) {
-    return (
+  return (
+    <div>
+      <button type='button' className='uk-button uk-button-primary button' onClick={handleAddUser}>
+        Add user
+      </button>
+      <button type='button' className='uk-button uk-button-primary button' onClick={handleCalculate}>
+        Calculate
+      </button>
+      <button type='button' className='uk-button uk-button-primary button' onClick={handleSave}>
+        Save
+      </button>
       <div>
-        <h1 id="tabelLabel">Users</h1>
-        <p>This component demonstrates fetching data from the server.</p>
-        <p>
-          <em>Loading...</em>
-        </p>
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <button
-          type="button"
-          className="uk-button uk-button-primary button"
-          onClick={handleAddUser}
+        <table
+          className='uk-table uk-table-divider uk-table-hover table-custom uk-table-middle'
+          aria-labelledby='tabelLabel'
         >
-          Add user
-        </button>
-        <button
-          type="button"
-          className="uk-button uk-button-primary button"
-          onClick={handleCalculate}
-        >
-          Calculate
-        </button>
-        <button
-          type="button"
-          className="uk-button uk-button-primary button"
-          onClick={handleSave}
-        >
-          Save
-        </button>
-        <div>
-          <table
-            className="uk-table uk-table-divider uk-table-hover table-custom "
-            aria-labelledby="tabelLabel"
-          >
-            <thead>
+          <thead>
+            <tr>
+              <th>UserID</th>
+              <th>Date Registration</th>
+              <th>Date Last Activity</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
               <tr>
-                <th>UserID</th>
-                <th>Date Registration</th>
-                <th>Date Last Activity</th>
-                <th>Action</th>
+                <td colSpan={4}>Loading table data...</td>
               </tr>
-            </thead>
-            <tbody>
-              {renderArr.length > 0 &&
-                renderArr.map((user, index) => (
-                  <User
-                    key={"user-" + user.userId}
-                    userData={user}
-                    onDateChange={onDateChange}
-                    onRemoveUser={onRemoveUser}
-                  />
-                ))}
-            </tbody>
-          </table>
-        </div>
-        <div>
-          <b>Rolling Retention 7 day:</b> {rollingRetention} %
-        </div>
-        <div>
+            ) : (
+              <>
+                {renderArr?.length > 0 ? (
+                  renderArr.map((user, index) => (
+                    <User
+                      key={'user-' + user.userId}
+                      userData={user}
+                      onDateChange={onDateChange}
+                      onRemoveUser={onRemoveUser}
+                    />
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4}>Users data is empty...</td>
+                  </tr>
+                )}
+              </>
+            )}
+          </tbody>
+        </table>
+      </div>
+      <div className='uk-margin-medium-bottom'>
+        <b>Rolling Retention 7 day:</b> {rollingRetention ? `${rollingRetention}%` : 'Press calculate to get data'}
+      </div>
+      <div>
         <Chart
-          style={{
-            zIndex: '-1',
-            position: 'absolute'
-          }}
-          width={"100%"}
-          height={"400px"}
-          chartType="Histogram"
+          width={'100%'}
+          height={'400px'}
+          chartType='Histogram'
           loader={<div>Loading Chart</div>}
           data={histogramData}
           options={{
-            title:
-              "Гистограмма распределения длительностей жизней пользователей ",
-            legend: { position: "none" },
+            title: 'Гистограмма распределения длительностей жизней пользователей ',
+            legend: { position: 'none' },
           }}
-          rootProps={{ "data-testid": "1" }}
+          rootProps={{ 'data-testid': '1' }}
         />
-        </div>
-        
       </div>
-    );
-  }
+    </div>
+  );
 };
 
 export default UsersTable;
