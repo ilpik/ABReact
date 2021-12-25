@@ -15,16 +15,28 @@ namespace ABReact.Controllers
     [Route("[controller]")]
     public class CalculationController : ControllerBase
     {
-        private readonly IEnumerable<User> _users;
+        private readonly AppDbContext _ctx;
         public CalculationController(AppDbContext ctx)
         {
-            _users = ctx.Users.ToList();
+            _ctx = ctx;
         }
 
         [HttpGet]
-        public double GetRollRet()
+        public async Task<ActionResult<double>> GetRollRet()
         {
-            return new Calculation(_users).RollingRetention();
+            List<User> users = await _ctx.Users.ToListAsync();
+            var value = await new Calculation(_ctx).RollingRetention();
+            var response="";
+            if (value >= 0 || value <= 100)
+            {
+                response = value.ToString();
+            }
+            else
+            {
+            response= "При таких входных данных значение для 'Rolling Retention 7 day' не может быть рассчитано";
+            }
+            return Ok(response);
+
         }
 
     }

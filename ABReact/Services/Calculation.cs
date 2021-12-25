@@ -7,21 +7,26 @@ using System.Threading.Tasks;
 using ABReact.Data;
 using ABReact.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 
 namespace ABReact.Services
 {
     public class Calculation
     {
-        private int _days = 1500;
+        private int _days = 7;
 
-        private readonly IEnumerable<User> _usersRet;
-        public Calculation(IEnumerable<User> users)
+        private  AppDbContext _ctx;
+        private IEnumerable<User> _usersRet;
+        public Calculation(AppDbContext ctx)
         {
-            _usersRet = users;
+            _ctx = ctx;
+
         }
 
-        public double RollingRetention()
+        public async Task<double> RollingRetention()
         {
+            _usersRet = await _ctx.Users.ToListAsync();
+
             int uReturned = ReturnedOnXDay(_days);
             int uRegistrated = RegisteredXDaysAgo(_days);
 
@@ -37,7 +42,8 @@ namespace ABReact.Services
 
             foreach (var user in _usersRet)
             {
-                    if(DateSubtract(user.LastActivity, DateTime.Now)>=x)
+                int i = DateSubtract(user.Created, DateTime.Now);
+                    if (i>= x)
                     {
                         count++;
                     }

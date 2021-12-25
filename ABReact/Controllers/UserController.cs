@@ -107,13 +107,14 @@ namespace ABReact.Controllers
 
             if (user == null)
             {
-                return NotFound("Ошибка");
+                return NotFound();
             }
 
             _ctx.Users.Remove(user);
             await _ctx.SaveChangesAsync();
 
             return await GetUsers();
+
 
         }
 

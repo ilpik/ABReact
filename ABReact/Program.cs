@@ -14,44 +14,45 @@ namespace ABReact
 {
     public class Program
     {
-        public static async Task Main(string[] args)
-        {
+        public static void Main(string[] args){
+            //public static async Task Main(string[] args)
+            //{
 
-            var host = CreateHostBuilder(args).Build();
-            try
-            {
-                var scope = host.Services.CreateScope();
+            //var host = CreateHostBuilder(args).Build();
+            //try
+            //{
+            //    var scope = host.Services.CreateScope();
 
-                var ctx = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            //    var ctx = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                await ctx.Database.EnsureCreatedAsync();
+            //    await ctx.Database.EnsureCreatedAsync();
 
-                if (!ctx.Users.Any())
-                {
-                    for (int i = 0; i < 20; i++)
-                    {
-                        DateTime created = RandomDay(new DateTime(2010, 1, 1), DateTime.Now);
-                        DateTime lastActivity = RandomDay(created, new DateTime(2021, 12, 1));
-                        var user = new User
-                        {
-                            Created = created,
-                            LastActivity = lastActivity,
+            //    if (!ctx.Users.Any())
+            //    {
+            //        for (int i = 0; i < 20; i++)
+            //        {
+            //            DateTime created = RandomDay(new DateTime(2010, 1, 1), DateTime.Now);
+            //            DateTime lastActivity = RandomDay(created, new DateTime(2021, 12, 1));
+            //            var user = new User
+            //            {
+            //                Created = created,
+            //                LastActivity = lastActivity,
 
-                        };
+            //            };
 
-                        await ctx.AddAsync(user);
-                        await ctx.SaveChangesAsync();
-                    }
+            //            await ctx.AddAsync(user);
+            //            await ctx.SaveChangesAsync();
+            //        }
 
-                }
+            //    }
 
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            await host.RunAsync();
-            //CreateHostBuilder(args).Build().Run();
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e.Message);
+            //}
+            //await host.RunAsync();
+            CreateHostBuilder(args).Build().Run();
         }
         private static DateTime RandomDay(DateTime start, DateTime end)
         {

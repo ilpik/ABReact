@@ -18,14 +18,14 @@ const User = ({ userData, onDateChange, onRemoveUser }) => {
       <td>{userId}</td>
       <td>
         <div style={{ position: "relative" }}>
-        <DatePicker
-          dateFormat={"dd.MM.yyyy"}
-          selected={createdDate}
-          popperPlacement="top-end"
-          onChange={(date) =>
-            onDateChange({ type: "created", date: new Date(date), userData })
-          }
-        />
+          <DatePicker
+            dateFormat={"dd.MM.yyyy"}
+            selected={createdDate}
+            popperPlacement="top-end"
+            onChange={(date) =>
+              onDateChange({ type: "created", date: new Date(date), userData })
+            }
+          />
         </div>
       </td>
       <td style={{ position: "relative" }}>
@@ -43,12 +43,14 @@ const User = ({ userData, onDateChange, onRemoveUser }) => {
           }
         />
       </td>
-       <td>
-       {!userData.isNewUser &&<i
-          uk-icon="icon: trash"
-          style={{ fontSize: "16px" }}
-          onClick={() => onRemoveUser(userId)}
-        ></i>}
+      <td>
+        {!userData.isNewUser && (
+          <i
+            uk-icon="icon: trash"
+            style={{ fontSize: "16px" }}
+            onClick={() => onRemoveUser(userId)}
+          ></i>
+        )}
       </td>
     </tr>
   );
