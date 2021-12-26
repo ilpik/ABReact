@@ -26,7 +26,7 @@ const UsersTable = () => {
 
   const getCalculations = () => {
     axios.get("/calculation").then((res) => {
-      if (!isNaN(res.data)) {
+      if (res.data >= 0) {
         console.log(res);
         setRollingRetention(res.data);
       } else {
@@ -141,7 +141,7 @@ const UsersTable = () => {
   const renderArr = [...users, ...newUsers];
 
   return (
-    <div>
+    <div className="uk-text-center">
       <button
         type="button"
         className="uk-button uk-button-primary button"
@@ -185,20 +185,18 @@ const UsersTable = () => {
               ? `   ${rollingRetention} %`
               : " Press calculate to get data"}
           </span>
-          <div>
-            {calcError && (
-              <>
-                <span
-                  className="uk-label uk-label-warning"
-                  style={{ whiteSpace: "break-spaces" }}
-                >
-                  {calcMessage}
-                </span>
-                <br />
-                <br />
-              </>
-            )}
-          </div>
+          {calcError && (
+            <>
+              <span
+                className="uk-label uk-label-warning"
+                style={{ whiteSpace: "break-spaces" }}
+              >
+                {calcMessage}
+              </span>
+              <br />
+              <br />
+            </>
+          )}
         </div>
 
         <div className="col-6">

@@ -29,7 +29,7 @@ namespace ABReact.Controllers
             var response="";
             if (value >= 0 || value <= 100)
             {
-                response = value.ToString();
+                response = value.ToString().Replace(',','.');
             }
             else
             {
