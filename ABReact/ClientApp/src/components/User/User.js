@@ -19,6 +19,7 @@ const User = ({ userData, onDateChange, onRemoveUser }) => {
       <td>
         <div style={{ position: "relative" }}>
           <DatePicker
+            style={{ zIndex: 1000000 }}
             dateFormat={"dd.MM.yyyy"}
             selected={createdDate}
             popperPlacement="top-end"

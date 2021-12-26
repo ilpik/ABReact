@@ -6,7 +6,6 @@ const histogramHeadings = ["UserId", "LifeSpan"];
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
   const [histogramData, setHistogramData] = useState([histogramHeadings]);
-  const [showHistogram, setShowHistogram] = useState(false);
   const [rollingRetention, setRollingRetention] = useState(null);
   const [newUsers, setNewUsers] = useState([]);
   const [changedUsersData, setChangedUsersData] = useState([]);
@@ -31,11 +30,9 @@ const UsersTable = () => {
         console.log(res);
         setRollingRetention(res.data);
       } else {
-        console.log("------ELSE-----");
         console.log(res);
         setCalcError(true);
         setCalcMessage(res.data);
-        setShowHistogram(true);
       }
     });
   };
@@ -168,57 +165,8 @@ const UsersTable = () => {
       >
         Save
       </button>
-      <div>
-        <table
-          className="uk-table uk-table-divider uk-table-hover table-custom uk-table-middle "
-          aria-labelledby="tabelLabel"
-        >
-          <thead>
-            <tr>
-              <th className="uk-text-center">UserID</th>
-              <th className="uk-text-center">Date Registration</th>
-              <th>Date Last Activity</th>
-              <th className="uk-text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={4}>Loading table data...</td>
-              </tr>
-            ) : (
-              <>
-                {renderArr?.length > 0 ? (
-                  renderArr.map((user, index) => (
-                    <User
-                      key={"user-" + user.userId}
-                      userData={user}
-                      onDateChange={onDateChange}
-                      onRemoveUser={onRemoveUser}
-                    />
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4}>Users data is empty...</td>
-                  </tr>
-                )}
-              </>
-            )}
-          </tbody>
-        </table>
-        <div className="uk-margin-medium-bottom uk-text-large">
-          Rolling Retention 7 day:
-          <span className="uk-text-muted uk-text-uppercase uk-text-large">
-            {rollingRetention
-              ? `   ${rollingRetention} %`
-              : " Press calculate to get data"}
-            <br />
-            {calcError && (
-              <p className="uk-label uk-label-warning">{calcMessage}</p>
-            )}
-          </span>
-        </div>
-        {showHistogram && (
+      <div className="row">
+        <div className="uk-text-center  col-6 table-custom ">
           <Chart
             width={"100%"}
             height={"400px"}
@@ -231,7 +179,67 @@ const UsersTable = () => {
               legend: { position: "bottom" },
             }}
           />
-        )}
+          <span className="uk-text-small	 uk-text-uppercase">
+            Rolling Retention 7 day:
+            {rollingRetention
+              ? `   ${rollingRetention} %`
+              : " Press calculate to get data"}
+          </span>
+          <div>
+            {calcError && (
+              <>
+                <span
+                  className="uk-label uk-label-warning"
+                  style={{ whiteSpace: "break-spaces" }}
+                >
+                  {calcMessage}
+                </span>
+                <br />
+                <br />
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="col-6">
+          <table
+            className="uk-table uk-table-divider uk-table-hover table-custom uk-table-middle "
+            aria-labelledby="tabelLabel"
+          >
+            <thead>
+              <tr>
+                <th className="uk-text-center">UserID</th>
+                <th className="uk-text-center">Date Registration</th>
+                <th>Date Last Activity</th>
+                <th className="uk-text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={4}>Loading table data...</td>
+                </tr>
+              ) : (
+                <>
+                  {renderArr?.length > 0 ? (
+                    renderArr.map((user, index) => (
+                      <User
+                        key={"user-" + user.userId}
+                        userData={user}
+                        onDateChange={onDateChange}
+                        onRemoveUser={onRemoveUser}
+                      />
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4}>Users data is empty...</td>
+                    </tr>
+                  )}
+                </>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
