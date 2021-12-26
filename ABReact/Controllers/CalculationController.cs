@@ -22,20 +22,12 @@ namespace ABReact.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<double>> GetRollRet()
+        public async Task<ActionResult> GetRollRet()
         {
             List<User> users = await _ctx.Users.ToListAsync();
             var value = await new Calculation(_ctx).RollingRetention();
-            var response="";
-            if (value >= 0 || value <= 100)
-            {
-                response = value.ToString().Replace(',','.');
-            }
-            else
-            {
-            response= "При таких входных данных значение для 'Rolling Retention 7 day' не может быть рассчитано";
-            }
-            return Ok(response);
+            
+            return Ok(value);
 
         }
 

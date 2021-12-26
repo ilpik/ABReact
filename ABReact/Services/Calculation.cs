@@ -23,7 +23,7 @@ namespace ABReact.Services
 
         }
 
-        public async Task<double> RollingRetention()
+        public async Task<string> RollingRetention()
         {
             _usersRet = await _ctx.Users.ToListAsync();
 
@@ -32,8 +32,22 @@ namespace ABReact.Services
 
             float rollingRetention = ((float)uReturned / (float)uRegistrated)*100;
             var resp = Math.Round(rollingRetention, 2);
+            var response = "";
 
-            return resp;
+            if (resp >= 0 || resp <= 100)
+            {
+                string str = resp.ToString();
+                if (str.Contains(','))
+                {
+                    str = str.Replace(',', '.');
+                }
+                response = str;
+            }
+            else
+            {
+                response = "При таких входных данных значение для 'Rolling Retention 7 day' не может быть рассчитано";
+            }
+            return response;
         }
 
         private int RegisteredXDaysAgo(int x)
@@ -43,6 +57,7 @@ namespace ABReact.Services
             foreach (var user in _usersRet)
             {
                 int i = DateSubtract(user.Created, DateTime.Now);
+                Console.WriteLine($"{i}>={x}");
                     if (i>= x)
                     {
                         count++;
